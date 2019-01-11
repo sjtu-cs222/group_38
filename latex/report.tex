@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{graphicx}
+\begin{document}
+\par Problem Formulation\\
+\par In our project, let $U=\{u_1,u_2 ...\}$ denotes the sets of users. The user-user influence matrix $Y=\{y_{uv}|u,v\in U\}$ is defined according to users' action, where $y_{uv}=1$ if user u read and retweet user v' weibo. In addition to the influence matrix Y, we also have a graph G available, which consists of the information of following. That is, if user u follows user v, there is a directed edge from u to v in G. In other words, there are massive directed edge (u',v') in G, where $u'\in U, v'\in U$ denote user u and the user v.
+\par Given an influence matrix Y as well as a graph G, we aim to predict user v's influence to user u. Our goal is to learn a prediction function $\hat{y}_{uv}=F(u,v;\theta)$, where $\hat{y}_{uv}$ denotes the user v's influence to user u, and $\theta$ denotes the model parameters of function F.\\
+\\
+\\
+\\
+\par Proposed Methods\\
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.5]{111.png}
+\caption{The overall framework of our model. It takes a user u and a user v as input, and outputs the predicted user v's influence to user u.}
+\end{figure}\\
+\par The framework of our model is illustrated in the Figure. It takes a user u and a user v as input, and outputs the predicted user v's influence to user u. We define $S^k_{u}=\{v'|(u',v') \in G \quad and \quad u' \in S^{k-1}_{u} \}, k = 1, 2, ...,n.$ And $S^0_u=V_u=\{v|y_{uv}=1\}$. For the input user u, his following set of $V_u$ is treated as seeds in G, then extended to form multiple sets $E^k_u$(k = 1,2,...,n), where $E^k_{u}=\{(u',v')|(u',v') \in G \quad and \quad u' \in S^{k-1}_{u} \}, k = 1, 2, ...,n.$ These sets are used to interact with the user v's embedding for obtaining the responses of user u with respect to user v, which are then combined to form the final user u's embedding. Lastly, we use the embeddings of user u and user v together to compute the predicted user v's influence to user u $\hat{y}_{uv}.$
+\par Also, as is shown in the Figure, the user v is associated with an embedding $v\in R^d$ through a certain encoder(such as the one-hot encoder), where d is the dimension of embeddings. Given the embedding v and the 1-hop set $E^1_u$ of user u, each tuple $(u'_i,v_i')$ in $E^1_u$ is assigned a relevance probability by comparing v to the $u'_i$ in this tuple:$p_i=softmax(v^T u'_i)=\frac{exp(v^T u'_i)}{\sum_{(u',v')\in E^1_u} exp(v^T u')}$, where $u'_i \in R^d$  are the embeddings of $u'_i$. After obtaining the relevance probabilities, we take the sum of v' in $E^1_u$ weighted by the corresponding relevance probabilities,
+and the vector $U^1$ is returned: $U^1=\sum_{(u'_i,v'_i)\in E^1_u} p_i v'_i$, where $v'_i \in R^d$ is the embedding of $v'_i$. Repeating the procedure, we can get $U^1,U^2...U^n$. Then we can get the embedding of user u with respect to user v: $u=\alpha_1 H^1+\alpha_2 H^2+...+\alpha_n H^n$, where $\alpha_i$s are positive trainable parameters.\\
+\par Finally, the embedding of u and the embedding of v are combined to output the predicted user v's influence to user u:$\hat{y}_{uv}=\sigma(u^T v)$, where $\sigma(x)=\frac{1}{1+exp(-x)}$.
+
+
+
+\end{document}
